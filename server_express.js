@@ -1,76 +1,79 @@
 import { config } from './config.js';
 import url from "url";
 import express from 'express';
+import dotenv from "dotenv"
+dotenv.config();
 const app = express();
-const PORT = process.env.SERVER_PORT || config.SERVER_PORT;
+const PORT = Number(process.env.SERVER_PORT) || config.SERVER_PORT;
 let isAllPrimes = true;
 let numOfPrimes = 0;
 let numbersToReturn = [];
-let arrayOfTenPrimes = [];
 
 app.set('view engine', 'pug');
 app.use(express.json());
 
 app.post('/api/numbers/prime/validate', (request, response) => {
     
-   const values = Object.keys(request.query).map((key) => isRishoni(req.query[key], req.query[key] - 1));
-   request.send(values.reduce((prev, current) => prev && current).toString());
-
+    const values = Object.keys(request.query).map((key) => isRishoni(req.query[key], req.query[key] - 1));
+    request.send(values.reduce((prev, current) => prev && current).toString());
+    
     console.log(isAllPrimes.toString());
     response.send(isAllPrimes.toString());
 });
 
 app.get('/api/numbers/prime', (request, response) => {
     for(let num = 1; numOfPrimes <= request.query.amount; num++)
+    {
+        if(isRishoni(num, num - 1))
         {
-            if(isRishoni(num, num - 1))
-            {
-                numbersToReturn.push(num);
-                numOfPrimes++;
-            }
+            numbersToReturn.push(num);
+            numOfPrimes++;
         }
+    }
     console.log(numbersToReturn.join());
     response.send(numbersToReturn.join());
 });
 
-app.get('api/numbers/prime/display', (request, response) => {
-
-    console.log("hi")
+app.get('/api/numbers/prime/display', (request, response) => {
     
-    /*generateTenPrimes(arrayOfTenPrimes); 
-
-    response.render('index', { div1: arrayOfTenPrimes[0], div2: arrayOfTenPrimes[1], div3: arrayOfTenPrimes[2],
-        div4: arrayOfTenPrimes[3], div5: arrayOfTenPrimes[4], div6: arrayOfTenPrimes[5],
-        div7: arrayOfTenPrimes[6], div8: arrayOfTenPrimes[7], div9: arrayOfTenPrimes[8],
-        div10: arrayOfTenPrimes[9] });
-    generateTenPrimes(arrayOfTenPrimes);*/
-})
-
+    console.log("hi");
+    
+    let arrayOfTenPrimes = generateTenPrimes(); 
+    
+    response.render('index', { title: "numbers", numbers: arrayOfTenPrimes});
+    console.log(arrayOfTenPrimes);
+});
+    
 app.listen(PORT, () => {
     console.log("server is listening to port " + PORT);
 });
-
+    
 function isRishoni(num, numMinusOne) {
-
+    
     if(numMinusOne == 0 || numMinusOne == 1)
-        return true;
-
+    return true;
+    
     if(num % numMinusOne == 0)
-        return false;
-        
+    return false;
+    
     return isRishoni(num, numMinusOne - 1);
 }
 
-function generateTenPrimes(arrayOfPrimes) {
+function generateTenPrimes() {
+
     let numOfPrimesToTen = 0;
     let num = 1;
+    let arrayOfTenPrimes = [];
 
-    while(numOfPrimesToTen > 10) {
-        if(isRishoni(num))
+    while(numOfPrimesToTen < 10) {
+
+        if(isRishoni(num, num-1))
         { 
             arrayOfTenPrimes.push(num);
             numOfPrimesToTen++;
         }
         num++;
     }
+
+    return arrayOfTenPrimes;
 }
