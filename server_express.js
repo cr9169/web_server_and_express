@@ -1,7 +1,7 @@
 import { config } from './config.js';
-import url from "url";
 import express from 'express';
 import dotenv from "dotenv"
+import bodyParser from 'body-parser';
 dotenv.config();
 const app = express();
 const PORT = Number(process.env.SERVER_PORT) || config.SERVER_PORT;
@@ -11,14 +11,21 @@ let numbersToReturn = [];
 
 app.set('view engine', 'pug');
 app.use(express.json());
+app.use(bodyParser.json())
 
 app.post('/api/numbers/prime/validate', (request, response) => {
     
-    const values = Object.keys(request.query).map((key) => isRishoni(req.query[key], req.query[key] - 1));
-    request.send(values.reduce((prev, current) => prev && current).toString());
-    
+    isAllPrimes = true;
+
+    let array = request.body;
+    array.forEach((element) => {
+        if(!isRishoni(element, element - 1))
+            isAllPrimes = false;
+    }, this);
+
     console.log(isAllPrimes.toString());
-    response.send(isAllPrimes.toString());
+    response.write(isAllPrimes.toString());
+
 });
 
 app.get('/api/numbers/prime', (request, response) => {
